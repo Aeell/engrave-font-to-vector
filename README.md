@@ -1,10 +1,14 @@
 
-# Engrave Font → Vector (SVG/DXF)
+# JKT Font Engraver
 
-Precision text-to-vector tool tailored for CNC engraving workflows. 
-Outputs **true millimeter** geometry with **0.001 mm** precision for easy import into Fusion 360, LightBurn, or any CAD/CAM.
+**Proprietary CNC Text Engraving Tool**
 
-> Based on the idea of [google-font-to-svg-path] but redesigned for CNC: consistent mm units, DXF R12 with `INSUNITS=4 (mm)`, kerning control, character separation, boolean union (approx.), and adaptive Bézier flattening.
+Developed by JKT Group s.r.o. for precision aluminum label manufacturing.
+
+Converts text to millimeter-accurate SVG/DXF files for CNC engraving workflows.
+Supports 60+ professional fonts with 0.001mm precision for Fusion 360 and industrial CAM systems.
+
+> Proprietary software for JKT Group s.r.o. CNC operations. Not for public distribution.
 
 ## Why this exists
 - The original tool targets web/SVG. This fork focuses on **manufacturing**: exact sizing in **mm**, kerning-on/off, per-character layers, and clean polylines for CAM.
@@ -256,29 +260,29 @@ npx vite build   # Production bundle
 - Use GitHub Discussions for feature suggestions
 - Include use case and expected workflow
 
-## Authors
+## Development
 
-**Stanimir Stankov** - Lead Developer
-- CNC Programming Specialist
-- JKT Group s.r.o.
-
-**JKT Group s.r.o.** - Company
-- CNC machining and engraving solutions
-- Custom aluminum label production
+**Developed by JKT Group s.r.o.**
+- CNC machining specialists
+- Custom aluminum engraving solutions
 - Prague, Czech Republic
 
-This project was developed for JKT Group s.r.o. to streamline CNC text engraving workflows for aluminum signage and industrial labeling applications.
+**Technical Implementation:**
+- Font parsing with OpenType.js
+- Path processing with SVG manipulation
+- DXF generation for CAD compatibility
+- Web-based interface for ease of use
+
+This proprietary tool is exclusively for JKT Group s.r.o. internal CNC engraving operations.
 
 ## License
 
-This project is licensed under the Creative Commons Attribution 4.0 International License.
+**Proprietary Software License - JKT Group s.r.o.**
 
-You are free to:
-- **Share** — copy and redistribute the material in any medium or format
-- **Adapt** — remix, transform, and build upon the material for any purpose, even commercially
+This software is proprietary to JKT Group s.r.o. and is provided under strict license terms for internal company use only.
 
-Under the following terms:
-- **Attribution** — You must give appropriate credit, provide a link to the license, and indicate if changes were made
-- **No additional restrictions** — You may not apply legal terms or technological measures that legally restrict others from doing anything the license permits
+- **Permitted Use**: JKT Group s.r.o. employees and authorized contractors for CNC engraving operations
+- **Restrictions**: No redistribution, public sharing, or external use without written permission
+- **Ownership**: All rights reserved by JKT Group s.r.o.
 
-See the [LICENSE](LICENSE) file for full license text.
+See the [LICENSE](LICENSE) file for complete terms.

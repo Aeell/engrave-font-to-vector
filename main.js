@@ -65,7 +65,7 @@ function render() {
   const scale = fontSizePt / unitsPerEm;
 
   let x = 0;
-  let y = 0;
+  let y = fontSizePt; // Baseline at font size for proper display
   let paths = [];
 
   for (let i = 0; i < text.length; i++) {
