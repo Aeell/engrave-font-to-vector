@@ -8,7 +8,7 @@ Developed by JKT Group s.r.o. for precision aluminum label manufacturing.
 Converts text to millimeter-accurate SVG/DXF files for CNC engraving workflows.
 Supports 60+ professional fonts with 0.001mm precision for Fusion 360 and industrial CAM systems.
 
-> Proprietary software for JKT Group s.r.o. CNC operations. Not for public distribution.
+> **Proprietary Software** - JKT Group s.r.o. Internal Use Only
 
 ## Why this exists
 - The original tool targets web/SVG. This fork focuses on **manufacturing**: exact sizing in **mm**, kerning-on/off, per-character layers, and clean polylines for CAM.

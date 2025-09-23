@@ -3,6 +3,7 @@ import * as opentype from 'opentype.js';
 import { mmToFontSize, transformPath, flattenSvgPath, roundMm } from './src/utils.js';
 import { DxfWriter, Units } from '@tarikjabiri/dxf';
 import { svgPathProperties } from 'svg-path-properties';
+import svgpath from 'svgpath';
 
 const $ = (id) => document.getElementById(id);
 
@@ -77,14 +78,16 @@ function render() {
       const pathData = glyph.getPath(x, y, fontSizePt).toPathData();
       // Convert from pt to mm coordinates
       const transformedPath = transformPath(pathData, 1/72 * 25.4, 0, 0);
-      addDebug('Path data length: ' + transformedPath.length);
+      // Flip Y for correct SVG display (fonts have Y upward, SVG has Y downward)
+      const displayPath = svgpath(transformedPath).scale(1, -1).toString();
+      addDebug('Path data length: ' + displayPath.length + ', original Y range check');
       const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-      path.setAttribute('d', transformedPath);
+      path.setAttribute('d', displayPath);
       path.setAttribute('fill', 'none');
       path.setAttribute('stroke', 'currentColor');
       path.setAttribute('stroke-width', strokeMm.toString());
       svg.appendChild(path);
-      paths.push(transformedPath);
+      paths.push(transformedPath); // Store original coordinates for export
 
       const advance = glyph.advanceWidth * scale * (25.4/72); // Convert to mm
       if (kerning && i < text.length - 1) {
@@ -104,10 +107,12 @@ function render() {
   // Set SVG viewBox to fit content with stroke
   const bbox = svg.getBBox();
   const padding = Math.max(strokeMm * 2, 10);
-  svg.setAttribute('viewBox', `${bbox.x - padding} ${bbox.y - padding} ${bbox.width + 2*padding} ${bbox.height + 2*padding}`);
+  const viewBox = `${bbox.x - padding} ${bbox.y - padding} ${bbox.width + 2*padding} ${bbox.height + 2*padding}`;
+  svg.setAttribute('viewBox', viewBox);
+  addDebug('ViewBox set to: ' + viewBox + ' (bbox: ' + bbox.x + ',' + bbox.y + ' ' + bbox.width + 'x' + bbox.height + ')');
 
   currentPath = paths.join(' ');
-  addDebug('Generated path length: ' + currentPath.length);
+  addDebug('Generated path length: ' + currentPath.length + ', total characters: ' + text.length);
   $('pathOutput').value = currentPath;
 }
 
@@ -189,11 +194,15 @@ $('font').addEventListener('change', (e) => {
 
 $('text').addEventListener('input', render);
 $('size').addEventListener('input', () => {
-  $('sizeValue').textContent = $('size').value + 'mm';
+  const newSize = $('size').value;
+  $('sizeValue').textContent = newSize + 'mm';
+  addDebug('Size changed to: ' + newSize + 'mm, triggering render');
   render();
 });
 $('stroke').addEventListener('input', () => {
-  $('strokeValue').textContent = $('stroke').value + 'mm';
+  const newStroke = $('stroke').value;
+  $('strokeValue').textContent = newStroke + 'mm';
+  addDebug('Stroke changed to: ' + newStroke + 'mm, triggering render');
   render();
 });
 $('kerning').addEventListener('change', render);
