@@ -89,13 +89,14 @@ function render() {
       svg.appendChild(path);
       paths.push(transformedPath); // Store original coordinates for export
 
-      // Use advanceWidth with padding for proper CNC spacing
+      // Use glyph width + fixed spacing for proper CNC visual separation
       let spacing;
       if (glyph.unicode === 32 || glyph.name === '.notdef') { // space or missing glyph
         spacing = glyph.advanceWidth * scale * (25.4/72);
       } else {
-        // Add 10% padding to advanceWidth for visual separation
-        spacing = glyph.advanceWidth * scale * (25.4/72) * 1.1;
+        // Use glyph width + 1mm fixed spacing for consistent separation
+        const glyphWidthMm = (glyph.width || glyph.advanceWidth) * scale * (25.4/72);
+        spacing = glyphWidthMm + 1.0; // 1mm additional spacing
       }
 
       if (kerning && i < text.length - 1) {
