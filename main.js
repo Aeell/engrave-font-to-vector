@@ -12,7 +12,7 @@ let debugLog = [];
 
 // Theme toggle
 const themeToggle = $('themeToggle');
-const currentTheme = localStorage.getItem('theme') || 'light';
+const currentTheme = localStorage.getItem('theme') || 'dark'; // Default to dark
 document.documentElement.setAttribute('data-theme', currentTheme);
 themeToggle.textContent = currentTheme === 'dark' ? '☀️' : '🌙';
 
@@ -50,19 +50,22 @@ function render() {
   }
 
   const text = $('text').value;
-  const size = parseInt($('size').value);
+  const heightMm = parseFloat($('size').value);
+  const strokeMm = parseFloat($('stroke').value);
   const kerning = $('kerning').checked;
 
-  addDebug('Rendering text: "' + text + '" size: ' + size + ' kerning: ' + kerning);
+  addDebug('Rendering text: "' + text + '" height: ' + heightMm + 'mm stroke: ' + strokeMm + 'mm kerning: ' + kerning);
 
   const svg = $('svg');
   svg.innerHTML = '';
 
+  // Convert mm to font size (points)
+  const fontSizePt = mmToFontSize(heightMm);
   const unitsPerEm = font.unitsPerEm || 1000;
-  const scale = size / unitsPerEm;
+  const scale = fontSizePt / unitsPerEm;
 
-  let x = 50;
-  let y = 120;
+  let x = 0;
+  let y = 0;
   let paths = [];
 
   for (let i = 0; i < text.length; i++) {
@@ -71,19 +74,23 @@ function render() {
     addDebug('Char: ' + char + ' glyph: ' + (glyph ? 'found' : 'not found'));
 
     if (glyph) {
-      const pathData = glyph.getPath(x, y, size).toPathData();
-      addDebug('Path data length: ' + pathData.length);
+      const pathData = glyph.getPath(x, y, fontSizePt).toPathData();
+      // Convert from pt to mm coordinates
+      const transformedPath = transformPath(pathData, 1/72 * 25.4, 0, 0);
+      addDebug('Path data length: ' + transformedPath.length);
       const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-      path.setAttribute('d', pathData);
-      path.setAttribute('fill', 'black');
+      path.setAttribute('d', transformedPath);
+      path.setAttribute('fill', 'none');
+      path.setAttribute('stroke', 'currentColor');
+      path.setAttribute('stroke-width', strokeMm.toString());
       svg.appendChild(path);
-      paths.push(pathData);
+      paths.push(transformedPath);
 
-      const advance = glyph.advanceWidth * scale;
+      const advance = glyph.advanceWidth * scale * (25.4/72); // Convert to mm
       if (kerning && i < text.length - 1) {
         const nextGlyph = font.charToGlyph(text[i + 1]);
         if (nextGlyph) {
-          const kern = font.getKerningValue(glyph, nextGlyph) * scale;
+          const kern = font.getKerningValue(glyph, nextGlyph) * scale * (25.4/72);
           x += advance + kern;
         } else {
           x += advance;
@@ -93,6 +100,11 @@ function render() {
       }
     }
   }
+
+  // Set SVG viewBox to fit content with stroke
+  const bbox = svg.getBBox();
+  const padding = Math.max(strokeMm * 2, 10);
+  svg.setAttribute('viewBox', `${bbox.x - padding} ${bbox.y - padding} ${bbox.width + 2*padding} ${bbox.height + 2*padding}`);
 
   currentPath = paths.join(' ');
   addDebug('Generated path length: ' + currentPath.length);
@@ -107,12 +119,21 @@ function downloadSvg() {
     return;
   }
 
+  // Calculate bounding box for proper viewBox
+  const tempSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  const tempPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+  tempPath.setAttribute('d', currentPath);
+  tempSvg.appendChild(tempPath);
+  document.body.appendChild(tempSvg);
+  const bbox = tempPath.getBBox();
+  document.body.removeChild(tempSvg);
+
   const svgContent = `<?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 200">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="${bbox.x} ${bbox.y} ${bbox.width} ${bbox.height}">
   <path d="${currentPath}" fill="black"/>
 </svg>`;
 
-  addDebug('SVG content generated, length: ' + svgContent.length);
+  addDebug('SVG content generated, viewBox: ' + bbox.x + ',' + bbox.y + ' ' + bbox.width + 'x' + bbox.height);
   download('font-path.svg', svgContent, 'image/svg+xml');
   addDebug('SVG download initiated');
 }
@@ -168,7 +189,11 @@ $('font').addEventListener('change', (e) => {
 
 $('text').addEventListener('input', render);
 $('size').addEventListener('input', () => {
-  $('sizeValue').textContent = $('size').value + 'px';
+  $('sizeValue').textContent = $('size').value + 'mm';
+  render();
+});
+$('stroke').addEventListener('input', () => {
+  $('strokeValue').textContent = $('stroke').value + 'mm';
   render();
 });
 $('kerning').addEventListener('change', render);

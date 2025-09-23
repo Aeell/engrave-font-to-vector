@@ -256,6 +256,19 @@ npx vite build   # Production bundle
 - Use GitHub Discussions for feature suggestions
 - Include use case and expected workflow
 
+## Authors
+
+**Stanimir Stankov** - Lead Developer
+- CNC Programming Specialist
+- JKT Group s.r.o.
+
+**JKT Group s.r.o.** - Company
+- CNC machining and engraving solutions
+- Custom aluminum label production
+- Prague, Czech Republic
+
+This project was developed for JKT Group s.r.o. to streamline CNC text engraving workflows for aluminum signage and industrial labeling applications.
+
 ## License
 
 This project is licensed under the Creative Commons Attribution 4.0 International License.

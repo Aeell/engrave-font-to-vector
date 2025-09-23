@@ -85,9 +85,14 @@
         <input type="text" id="text" value="Hello World" />
       </div>
       <div class="option">
-        <label for="size">Size:</label>
-        <input type="range" id="size" min="10" max="200" value="100" />
-        <span id="sizeValue">100px</span>
+        <label for="size">Height (mm):</label>
+        <input type="number" id="size" min="0.1" max="500" step="0.001" value="25.000" />
+        <span id="sizeValue">25.000mm</span>
+      </div>
+      <div class="option">
+        <label for="stroke">Stroke Width (mm):</label>
+        <input type="number" id="stroke" min="0.001" max="10" step="0.001" value="0.500" />
+        <span id="strokeValue">0.500mm</span>
       </div>
       <div class="option">
         <label for="kerning">Kerning:</label>

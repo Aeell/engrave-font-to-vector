@@ -40,5 +40,5 @@ export function flattenSvgPath(d: string, toleranceMm: number): number[][] {
 
 /** Apply transform to path string (translate + scale) */
 export function transformPath(d: string, scale: number, tx: number, ty: number): string {
-  return svgpath(d).scale(scale, -scale).translate(tx, -ty).toString(); // flip Y to CAD (Y up)
+  return svgpath(d).scale(scale, scale).translate(tx, ty).toString(); // normal orientation for CNC
 }
