@@ -4,6 +4,19 @@ import { mmToFontSize, transformPath } from './src/utils.js';
 
 const $ = (id)=>document.getElementById(id);
 
+// Dark mode toggle
+const themeToggle = $('themeToggle');
+const currentTheme = localStorage.getItem('theme') || 'light';
+document.documentElement.setAttribute('data-theme', currentTheme);
+themeToggle.textContent = currentTheme === 'dark' ? '☀️' : '🌙';
+
+themeToggle.onclick = () => {
+  const newTheme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', newTheme);
+  localStorage.setItem('theme', newTheme);
+  themeToggle.textContent = newTheme === 'dark' ? '☀️' : '🌙';
+};
+
 function download(name, content, type='application/octet-stream') {
   const a=document.createElement('a');
   a.href = URL.createObjectURL(new Blob([content], {type}));
@@ -13,13 +26,21 @@ function download(name, content, type='application/octet-stream') {
 }
 
 let lastPaths = [];
+let lastFont = null;
 
 $('render').onclick = async () => {
-  const file = /** @type {HTMLInputElement} */($('font')).files[0];
-  if (!file) { alert('Choose a font file'); return; }
-  const arrayBuffer = await file.arrayBuffer();
-  const font = opentype.parse(arrayBuffer);
-  const text = /** @type {HTMLTextAreaElement} */($('text')).value;
+  let font = lastFont;
+  if (!font) {
+    const file = /** @type {HTMLInputElement} */($('font')).files[0];
+    if (!file) { alert('Please select a font file first'); return; }
+    const arrayBuffer = await file.arrayBuffer();
+    font = opentype.parse(arrayBuffer);
+    lastFont = font;
+  }
+
+  const text = /** @type {HTMLTextAreaElement} */($('text')).value.trim();
+  if (!text) { alert('Please enter some text'); return; }
+
   const heightMm = parseFloat((/** @type {HTMLInputElement} */($('height')).value));
   const tol = parseFloat((/** @type {HTMLInputElement} */($('tol')).value));
   const kerning = (/** @type {HTMLInputElement} */($('kerning'))).checked;
@@ -28,22 +49,22 @@ $('render').onclick = async () => {
   const lines = text.split(/\r?\n/);
 
   const svg = /** @type {SVGSVGElement} */($('svg'));
-  svg.innerHTML='';
+  svg.innerHTML = '';
   lastPaths = [];
 
   const unitsPerEm = font.unitsPerEm || 1000;
   const sizePt = mmToFontSize(heightMm);
 
-  let x=0, y=0;
-  let minX=1e9, minY=1e9, maxX=-1e9, maxY=-1e9;
+  let x = 0, y = 0;
+  let minX = 1e9, minY = 1e9, maxX = -1e9, maxY = -1e9;
 
-  for (let li=0; li<lines.length; li++) {
+  for (let li = 0; li < lines.length; li++) {
     const line = lines[li];
     x = 0;
-    for (let i=0; i<line.length; i++) {
+    for (let i = 0; i < line.length; i++) {
       const ch = line[i];
       const g = font.charToGlyph(ch);
-      const prev = i>0 ? font.charToGlyph(line[i-1]) : null;
+      const prev = i > 0 ? font.charToGlyph(line[i-1]) : null;
       const kern = kerning && prev ? font.getKerningValue(prev, g) : 0;
 
       const p = g.getPath(0, 0, sizePt);
@@ -52,9 +73,9 @@ $('render').onclick = async () => {
 
       const path = document.createElementNS('http://www.w3.org/2000/svg','path');
       path.setAttribute('d', d2);
-      path.setAttribute('fill','none');
-      path.setAttribute('stroke','black');
-      path.setAttribute('stroke-width','0.1');
+      path.setAttribute('fill', 'none');
+      path.setAttribute('stroke', 'currentColor');
+      path.setAttribute('stroke-width', '0.1');
       svg.appendChild(path);
 
       lastPaths.push(d2);
