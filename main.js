@@ -89,17 +89,24 @@ function render() {
       svg.appendChild(path);
       paths.push(transformedPath); // Store original coordinates for export
 
-      const advance = glyph.advanceWidth * scale * (25.4/72); // Convert to mm
+      // Use glyph width for spacing to prevent overlap, advanceWidth for spaces
+      let spacing;
+      if (glyph.unicode === 32 || glyph.name === '.notdef') { // space or missing glyph
+        spacing = glyph.advanceWidth * scale * (25.4/72);
+      } else {
+        spacing = (glyph.width || glyph.advanceWidth) * scale * (25.4/72);
+      }
+
       if (kerning && i < text.length - 1) {
         const nextGlyph = font.charToGlyph(text[i + 1]);
         if (nextGlyph) {
           const kern = font.getKerningValue(glyph, nextGlyph) * scale * (25.4/72);
-          x += advance + kern;
+          x += spacing + kern;
         } else {
-          x += advance;
+          x += spacing;
         }
       } else {
-        x += advance;
+        x += spacing;
       }
     }
   }

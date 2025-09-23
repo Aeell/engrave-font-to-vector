@@ -1,89 +1,122 @@
 
 # JKT Font Engraver
 
-**Proprietary CNC Text Engraving Tool**
+**Proprietary CNC Text Engraving Software for Aluminum Labels**
 
-Developed by JKT Group s.r.o. for precision aluminum label manufacturing.
-
-Converts text to millimeter-accurate SVG/DXF files for CNC engraving workflows.
-Supports 60+ professional fonts with 0.001mm precision for Fusion 360 and industrial CAM systems.
+Developed exclusively for JKT Group s.r.o. CNC machining operations in Prague, Czech Republic.
 
 > **Proprietary Software** - JKT Group s.r.o. Internal Use Only
 
-## Why this exists
-- The original tool targets web/SVG. This fork focuses on **manufacturing**: exact sizing in **mm**, kerning-on/off, per-character layers, and clean polylines for CAM.
-- DXF export writes **POLYLINE/LWPOLYLINE** with mm units and configurable tolerance.
+## User Guide
 
-## Features
+### Getting Started
+1. **Open the tool** in your web browser at the deployed URL
+2. **Select a font** from the dropdown (60+ professional fonts available)
+3. **Enter your text** in the input field
+4. **Set dimensions**:
+   - **Height**: Character height in millimeters (0.1-500mm, 0.001mm precision)
+   - **Stroke Width**: Engraving tool width in millimeters (0.001-10mm, 0.001mm precision)
+5. **Adjust options**:
+   - **Kerning**: Enable/disable automatic character spacing
+   - **Separate Characters**: Create individual layers for each character (DXF only)
+6. **Preview** your text in real-time
+7. **Download** SVG or DXF files for your CNC software
 
-### Core Functionality
-- ✅ **Millimeter-precise sizing**: Input text height in millimeters with 0.001mm precision for CNC accuracy.
-- ✅ **Google Fonts integration**: 60+ professional fonts loaded directly from Google Fonts static CDN.
-- ✅ **Real-time preview**: Live SVG rendering as you type, adjust size, or change settings.
-- ✅ **Typography controls**:
-  - Kerning toggle for automatic character spacing.
-  - Letter spacing adjustment (-5mm to +10mm).
-  - Line spacing for multi-line text.
-  - Separate characters option for individual DXF layers.
-- ✅ **Export formats**:
-  - **SVG**: Clean vector paths for web/SVG editors.
-  - **DXF**: Polylines optimized for Fusion 360, LightBurn, and other CAM software.
-- ✅ **Adaptive Bézier flattening**: Configurable tolerance (0.01-1mm) for curve approximation.
+### Font Selection
+- Choose from 60+ high-quality fonts optimized for engraving
+- Fonts load automatically from Google Fonts CDN
+- Alatsi is selected by default for industrial applications
 
-### User Interface
-- ✅ **Dark/Light mode**: Automatic theme switching with local storage persistence.
-- ✅ **Responsive design**: Works on desktop, tablet, and mobile devices.
-- ✅ **Input validation**: Real-time feedback with helpful error messages.
-- ✅ **Font caching**: Loaded fonts persist across sessions for faster re-rendering.
-- ✅ **Debug panel**: Built-in debugging tools for troubleshooting (development mode).
+### Dimension Settings
+- **Height**: Controls the vertical size of characters in millimeters
+- **Stroke Width**: Controls the thickness of engraved lines in millimeters
+- All measurements with 0.001mm precision for CNC accuracy
+- Exported files maintain exact dimensions
 
-### Technical Features
-- ✅ **Cross-platform CLI**: Node.js command-line tool for batch processing.
-- ✅ **Web UI**: Browser-based interface with no installation required.
-- ✅ **TypeScript**: Fully typed codebase for reliability and maintainability.
-- ✅ **Vite build system**: Fast development and optimized production builds.
-- ✅ **GitHub Pages deployment**: Automatic deployment with GitHub Actions.
+### Export Formats
+- **SVG**: Vector format for Inkscape, Adobe Illustrator, LightBurn
+- **DXF**: CAD format for Fusion 360, AutoCAD, CAM software
+- Both formats include proper millimeter units and scaling
 
-### CNC-Specific Optimizations
-- ✅ **Units handling**: All outputs in millimeters ($INSUNITS=4 for DXF).
-- ✅ **Path optimization**: Minimal polylines with configurable chord tolerance.
-- ✅ **Layer separation**: Individual character layers for complex engraving.
-- ✅ **Fusion 360 compatibility**: DXF R12 format with proper scaling.
+### Theme
+- Toggle between dark and light modes using the moon/sun button
+- Dark mode optimized for CNC workshop environments
+- Theme preference saved automatically
 
-## Install (CLI + Web UI)
-```bash
-# Node 18+ recommended
-npm i
-npm run build
+## CNC Workflow Integration
 
-# CLI usage
-node dist/cli.js --font ./fonts/Roboto-Regular.ttf --text "ŠeryWood" --height-mm 12.5 --out out --dxf --svg --tolerance 0.05
+### For Autodesk Fusion 360
+1. Download DXF file from the tool
+2. Import DXF into Fusion 360 (ensure units are set to millimeters)
+3. Create engraving toolpath
+4. Set tool diameter to match stroke width setting
+5. Generate G-code for your CNC machine
 
-# Web UI (dev)
-npm run web  # opens Vite dev server
-```
+### For LightBurn
+1. Download SVG file from the tool
+2. Import SVG into LightBurn
+3. Verify scale is 1:1 (should be correct in mm)
+4. Create engraving layer
+5. Set power/speed appropriate for aluminum
 
-## CLI Usage
+### For Other CAM Software
+- Import SVG/DXF files
+- Verify units are set to millimeters
+- Use stroke width as reference for tool diameter
+- Adjust toolpaths for aluminum material properties
 
-The command-line interface provides batch processing capabilities for automated workflows.
+## Troubleshooting
 
-### Basic Syntax
-```bash
-node dist/cli.js --font <font-file> --text <text> [options]
-```
+### Text Overlap Issues
+- Ensure kerning is disabled if characters appear too close
+- Try different fonts if spacing issues persist
+- Check debug panel for positioning information
 
-### Required Options
-- `--font <file>`: Path to TTF/OTF font file
-- `--text <string>`: Text to convert
+### Font Loading Problems
+- Wait for font to load completely before rendering
+- Check internet connection for font downloads
+- Try refreshing the page if fonts fail to load
 
-### Geometry Options
-- `--height-mm <mm>`: Text height in millimeters (default: 10)
-- `--width-mm <mm>`: Target width (overrides height if specified)
-- `--letter-spacing <mm>`: Additional space between characters (default: 0)
-- `--line-spacing <mm>`: Space between lines for multi-line text (default: 0)
+### Export Issues
+- Verify dimensions in exported files match input settings
+- Check that CNC software units are set to millimeters
+- For Fusion 360, ensure DXF import settings are correct
 
-### Typography Options
-- `--kerning`: Enable automatic character spacing adjustments
+### Performance
+- Large text may take time to render
+- Complex fonts load slower than simple ones
+- Browser memory limits apply for very large exports
+
+## Support
+
+For technical support or questions about the JKT Font Engraver:
+
+**Contact**: JKT Group s.r.o., Prague, Czech Republic
+**Purpose**: Internal CNC engraving operations for aluminum label manufacturing
+
+This tool is proprietary to JKT Group s.r.o. and not available for external use.
+
+## Troubleshooting
+
+### Text Overlap Issues
+- Ensure kerning is disabled if characters appear too close
+- Try different fonts if spacing issues persist
+- Check debug panel for positioning information
+
+### Font Loading Problems
+- Wait for font to load completely before rendering
+- Check internet connection for font downloads
+- Try refreshing the page if fonts fail to load
+
+### Export Issues
+- Verify dimensions in exported files match input settings
+- Check that CNC software units are set to millimeters
+- For Fusion 360, ensure DXF import settings are correct
+
+### Performance
+- Large text may take time to render
+- Complex fonts load slower than simple ones
+- Browser memory limits apply for very large exports
 
 ### Output Options
 - `--separate`: Create individual layers for each character (DXF only)
