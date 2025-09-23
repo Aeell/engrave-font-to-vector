@@ -89,14 +89,13 @@ function render() {
       svg.appendChild(path);
       paths.push(transformedPath); // Store original coordinates for export
 
-      // Use glyph width + generous spacing for clear CNC visual separation
+      // Use fixed spacing for consistent CNC engraving separation
       let spacing;
       if (glyph.unicode === 32 || glyph.name === '.notdef') { // space or missing glyph
         spacing = glyph.advanceWidth * scale * (25.4/72);
       } else {
-        // Use glyph width + 2mm fixed spacing for clear separation
-        const glyphWidthMm = (glyph.width || glyph.advanceWidth) * scale * (25.4/72);
-        spacing = glyphWidthMm + 2.0; // 2mm additional spacing
+        // Fixed 4mm spacing per character for clear CNC separation
+        spacing = 4.0; // 4mm consistent spacing between characters
       }
 
       if (kerning && i < text.length - 1) {
