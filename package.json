@@ -1,0 +1,32 @@
+{
+  "name": "engrave-font-to-vector",
+  "version": "0.1.0",
+  "private": false,
+  "description": "Convert text to precise SVG/DXF for CNC engraving with millimeter units.",
+  "license": "MIT",
+  "type": "module",
+  "bin": {
+    "engrave-text": "dist/cli.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "vite",
+    "preview": "vite preview",
+    "web": "vite",
+    "typecheck": "tsc --noEmit",
+    "cli": "node dist/cli.js"
+  },
+  "dependencies": {
+    "@tarikjabiri/dxf": "^2.8.9",
+    "clipper-lib": "^6.4.2",
+    "commander": "^12.1.0",
+    "opentype.js": "^1.3.4",
+    "svg-path-properties": "^2.0.0",
+    "svgpath": "^2.6.0"
+  },
+  "devDependencies": {
+    "@types/node": "^24.5.2",
+    "typescript": "^5.6.2",
+    "vite": "^5.4.0"
+  }
+}
