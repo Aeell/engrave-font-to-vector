@@ -89,25 +89,25 @@ function render() {
       svg.appendChild(path);
       paths.push(transformedPath); // Store original coordinates for export
 
-      // Use fixed spacing for consistent CNC engraving separation
-      let spacing;
+      // Use fixed spacing in pt units for consistent CNC engraving separation
+      let spacingPt;
       if (glyph.unicode === 32 || glyph.name === '.notdef') { // space or missing glyph
-        spacing = glyph.advanceWidth * scale * (25.4/72);
+        spacingPt = glyph.advanceWidth;
       } else {
-        // Fixed 4mm spacing per character for clear CNC separation
-        spacing = 4.0; // 4mm consistent spacing between characters
+        // Fixed spacing: convert 4mm to pt units
+        spacingPt = 4.0 * (72 / 25.4); // 4mm in pt ≈ 11.34pt
       }
 
       if (kerning && i < text.length - 1) {
         const nextGlyph = font.charToGlyph(text[i + 1]);
         if (nextGlyph) {
-          const kern = font.getKerningValue(glyph, nextGlyph) * scale * (25.4/72);
-          x += spacing + kern;
+          const kern = font.getKerningValue(glyph, nextGlyph);
+          x += spacingPt + kern;
         } else {
-          x += spacing;
+          x += spacingPt;
         }
       } else {
-        x += spacing;
+        x += spacingPt;
       }
     }
   }
