@@ -1,0 +1,68 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Engrave Font → Vector (mm)</title>
+  <script type="module" crossorigin src="/engrave-font-to-vector/assets/index-B2mGBsnD.js"></script>
+  <link rel="stylesheet" crossorigin href="/engrave-font-to-vector/assets/index-r7iuX_nq.css">
+</head>
+<body>
+  <div id="container">
+    <h1>Engrave Font → Vector</h1>
+    <div id="options">
+      <div class="option">
+        <label for="font">Font:</label>
+        <select id="font">
+          <option value="https://fonts.gstatic.com/s/roboto/v30/KFOmCnqEu92Fr1Mu4mxK.woff">Roboto</option>
+          <option value="https://fonts.gstatic.com/s/opensans/v34/memSYaGs126MiZpBA-UvWbX2vVnXBbObj2OVZyOOSr4dVJWUgsjZ0B4taVIGxA.woff">Open Sans</option>
+          <option value="https://fonts.gstatic.com/s/lato/v24/S6uyw4BMUTPHjx4wXg.woff">Lato</option>
+          <option value="https://fonts.gstatic.com/s/montserrat/v25/JTUHjIg1_i6t8kCHKm4532VJOt5-QNFgpCuM73w5aXp-pQ.woff">Montserrat</option>
+          <option value="https://fonts.gstatic.com/s/sourcesanspro/v21/6xK3dSBYKcSV-LCoeQqfX1RYOo3qOK7l.woff">Source Sans Pro</option>
+          <option value="https://fonts.gstatic.com/s/raleway/v28/1Ptug8zYS_SKggPNyC0IT4ttDfA.woff">Raleway</option>
+          <option value="https://fonts.gstatic.com/s/oswald/v49/TK3_WkUHHAIjg75cFRf3bXL8LICs1_FvsUZiZQ.woff">Oswald</option>
+          <option value="https://fonts.gstatic.com/s/merriweather/v30/u-440qyriQwlOrhSvowK_l5-fCZM.woff">Merriweather</option>
+          <option value="https://fonts.gstatic.com/s/playfairdisplay/v30/nuFvD-vYSZviVYUb_rj3ij__anPXJzDwcbmjW.woff">Playfair Display</option>
+          <option value="https://fonts.gstatic.com/s/dancingscript/v25/If2cXTr6YS-zF4S-kcSWSVi_sxjsohD9F50Ruu7BMSo3Rep8hNP.woff">Dancing Script</option>
+          <option value="https://fonts.gstatic.com/s/ubuntu/v20/4iCs6KVjbNBYlgoKfw72.woff">Ubuntu</option>
+          <option value="https://fonts.gstatic.com/s/nunito/v25/XRXV3I6Li01BKofINeaB.woff">Nunito</option>
+          <option value="https://fonts.gstatic.com/s/poppins/v20/pxiEyp8kv8JHgFVrFJA.woff">Poppins</option>
+          <option value="https://fonts.gstatic.com/s/inter/v12/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuLyfAZ9hiJ-Ek-_EeA.woff">Inter</option>
+          <option value="https://fonts.gstatic.com/s/robotoslab/v24/BngbUXZYTXPIvIBgJJSb.woff">Roboto Slab</option>
+        </select>
+      </div>
+      <div class="option">
+        <label for="text">Text:</label>
+        <input type="text" id="text" value="Hello World" />
+      </div>
+      <div class="option">
+        <label for="size">Size:</label>
+        <input type="range" id="size" min="10" max="200" value="100" />
+        <span id="sizeValue">100px</span>
+      </div>
+      <div class="option">
+        <label for="kerning">Kerning:</label>
+        <input type="checkbox" id="kerning" checked />
+      </div>
+      <div class="option">
+        <label for="separate">Separate Chars:</label>
+        <input type="checkbox" id="separate" />
+      </div>
+      <div class="option">
+        <button id="downloadSvg">Download SVG</button>
+        <button id="downloadDxf">Download DXF</button>
+      </div>
+    </div>
+    <div id="preview">
+      <svg id="svg" viewBox="0 0 800 200">
+        <text x="400" y="100" text-anchor="middle" font-size="50" fill="currentColor">Loading font...</text>
+      </svg>
+    </div>
+    <div id="path">
+      <h2>SVG Path</h2>
+      <textarea id="pathOutput" readonly></textarea>
+    </div>
+  </div>
+</body>
+</html>
