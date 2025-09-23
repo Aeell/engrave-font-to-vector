@@ -1,131 +1,134 @@
 
 import * as opentype from 'opentype.js';
-import { mmToFontSize, transformPath } from './src/utils.js';
+import { mmToFontSize, transformPath, flattenSvgPath, roundMm } from './src/utils.js';
+import { DxfWriter, Units } from '@tarikjabiri/dxf';
+import { svgPathProperties } from 'svg-path-properties';
 
-const $ = (id)=>document.getElementById(id);
+const $ = (id) => document.getElementById(id);
 
-// Dark mode toggle
-const themeToggle = $('themeToggle');
-const currentTheme = localStorage.getItem('theme') || 'light';
-document.documentElement.setAttribute('data-theme', currentTheme);
-themeToggle.textContent = currentTheme === 'dark' ? '☀️' : '🌙';
+let font = null;
+let currentPath = '';
 
-themeToggle.onclick = () => {
-  const newTheme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
-  document.documentElement.setAttribute('data-theme', newTheme);
-  localStorage.setItem('theme', newTheme);
-  themeToggle.textContent = newTheme === 'dark' ? '☀️' : '🌙';
-};
-
-function download(name, content, type='application/octet-stream') {
-  const a=document.createElement('a');
-  a.href = URL.createObjectURL(new Blob([content], {type}));
-  a.download = name;
-  a.click();
-  URL.revokeObjectURL(a.href);
+async function loadFont(url) {
+  try {
+    font = await opentype.load(url);
+    render();
+  } catch (e) {
+    console.error('Failed to load font:', e);
+    $('svg').innerHTML = '<text x="400" y="100" text-anchor="middle" font-size="20" fill="red">Failed to load font</text>';
+  }
 }
 
-let lastPaths = [];
-let lastFont = null;
+function render() {
+  if (!font) return;
 
-$('render').onclick = async () => {
-  let font = lastFont;
-  if (!font) {
-    const file = /** @type {HTMLInputElement} */($('font')).files[0];
-    if (!file) { alert('Please select a font file first'); return; }
-    const arrayBuffer = await file.arrayBuffer();
-    font = opentype.parse(arrayBuffer);
-    lastFont = font;
-  }
+  const text = $('text').value;
+  const size = parseInt($('size').value);
+  const kerning = $('kerning').checked;
 
-  const text = /** @type {HTMLTextAreaElement} */($('text')).value.trim();
-  if (!text) { alert('Please enter some text'); return; }
-
-  const heightMm = parseFloat((/** @type {HTMLInputElement} */($('height')).value));
-  const tol = parseFloat((/** @type {HTMLInputElement} */($('tol')).value));
-  const kerning = (/** @type {HTMLInputElement} */($('kerning'))).checked;
-  const letterSpacing = parseFloat((/** @type {HTMLInputElement} */($('ls')).value));
-  const lineSpacing = parseFloat((/** @type {HTMLInputElement} */($('line')).value));
-  const lines = text.split(/\r?\n/);
-
-  const svg = /** @type {SVGSVGElement} */($('svg'));
+  const svg = $('svg');
   svg.innerHTML = '';
-  lastPaths = [];
 
   const unitsPerEm = font.unitsPerEm || 1000;
-  const sizePt = mmToFontSize(heightMm);
+  const scale = size / unitsPerEm;
 
-  let x = 0, y = 0;
-  let minX = 1e9, minY = 1e9, maxX = -1e9, maxY = -1e9;
+  let x = 50;
+  let y = 120;
+  let paths = [];
 
-  for (let li = 0; li < lines.length; li++) {
-    const line = lines[li];
-    x = 0;
-    for (let i = 0; i < line.length; i++) {
-      const ch = line[i];
-      const g = font.charToGlyph(ch);
-      const prev = i > 0 ? font.charToGlyph(line[i-1]) : null;
-      const kern = kerning && prev ? font.getKerningValue(prev, g) : 0;
+  for (let i = 0; i < text.length; i++) {
+    const char = text[i];
+    const glyph = font.charToGlyph(char);
 
-      const p = g.getPath(0, 0, sizePt);
-      const d = p.toPathData(5);
-      const d2 = transformPath(d, (1/72)*25.4, x, y);
-
-      const path = document.createElementNS('http://www.w3.org/2000/svg','path');
-      path.setAttribute('d', d2);
-      path.setAttribute('fill', 'none');
-      path.setAttribute('stroke', 'currentColor');
-      path.setAttribute('stroke-width', '0.1');
+    if (glyph) {
+      const pathData = glyph.getPath(x, y, size).toPathData();
+      const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+      path.setAttribute('d', pathData);
+      path.setAttribute('fill', 'black');
       svg.appendChild(path);
+      paths.push(pathData);
 
-      lastPaths.push(d2);
-
-      // bbox estimate via SVG path element
-      const bb = path.getBBox();
-      minX = Math.min(minX, bb.x);
-      minY = Math.min(minY, bb.y);
-      maxX = Math.max(maxX, bb.x + bb.width);
-      maxY = Math.max(maxY, bb.y + bb.height);
-
-      const advMm = (g.advanceWidth + kern) * (sizePt / unitsPerEm) * (25.4/72) + letterSpacing;
-      x += advMm;
+      const advance = glyph.advanceWidth * scale;
+      if (kerning && i < text.length - 1) {
+        const nextGlyph = font.charToGlyph(text[i + 1]);
+        if (nextGlyph) {
+          const kern = font.getKerningValue(glyph, nextGlyph) * scale;
+          x += advance + kern;
+        } else {
+          x += advance;
+        }
+      } else {
+        x += advance;
+      }
     }
-    y -= lineSpacing;
   }
 
-  const w = maxX - minX;
-  const h = maxY - minY;
-  svg.setAttribute('viewBox', `${minX} ${-maxY} ${w} ${h}`);
-};
+  currentPath = paths.join(' ');
+  $('pathOutput').value = currentPath;
+}
 
-$('saveSvg').onclick = () => {
-  if (!lastPaths.length) return;
-  const paths = lastPaths.map(d=>`<path d="${d}" fill="none" stroke="black" stroke-width="0.1"/>`).join('\n  ');
-  const svg = `<?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg">
-  ${paths}
+function downloadSvg() {
+  if (!currentPath) return;
+
+  const svgContent = `<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 200">
+  <path d="${currentPath}" fill="black"/>
 </svg>`;
-  download('text.svg', svg, 'image/svg+xml');
-};
 
-$('saveDxf').onclick = async () => {
-  if (!lastPaths.length) return;
-  const { default: DxfWriter, Units } = await import('@tarikjabiri/dxf');
+  download('font-path.svg', svgContent, 'image/svg+xml');
+}
+
+function downloadDxf() {
+  if (!currentPath) return;
+
   const dxf = new DxfWriter();
   dxf.setUnits(Units.Millimeters);
 
-  for (const d of lastPaths) {
-    // naive flatten by sampling along length
-    const { SVGPathProperties } = await import('svg-path-properties');
-    const props = new SVGPathProperties(d);
-    const L = props.getTotalLength();
-    const step = Math.max(0.1, parseFloat((/** @type {HTMLInputElement} */($('tol')).value)));
-    const pts = [];
-    for (let s=0; s<=L; s+=step) {
-      const p = props.getPointAtLength(s);
-      pts.push({x:p.x, y:p.y});
-    }
-    if (pts.length>=2) dxf.addPolyline(pts, false, 'TEXT');
+  const props = new svgPathProperties(currentPath);
+  const length = props.getTotalLength();
+  const step = 0.5; // 0.5mm steps
+  const points = [];
+
+  for (let s = 0; s <= length; s += step) {
+    const point = props.getPointAtLength(s);
+    points.push({ x: point.x, y: point.y });
   }
-  download('text.dxf', dxf.stringify(), 'application/dxf');
-};
+
+  if (points.length >= 2) {
+    dxf.addPolyline(points, false, 'FONT_PATH');
+  }
+
+  download('font-path.dxf', dxf.stringify(), 'application/dxf');
+}
+
+function download(filename, content, mimeType) {
+  const blob = new Blob([content], { type: mimeType });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+// Event listeners
+$('font').addEventListener('change', (e) => {
+  const url = e.target.value;
+  loadFont(url);
+});
+
+$('text').addEventListener('input', render);
+$('size').addEventListener('input', () => {
+  $('sizeValue').textContent = $('size').value + 'px';
+  render();
+});
+$('kerning').addEventListener('change', render);
+$('separate').addEventListener('change', render);
+
+$('downloadSvg').addEventListener('click', downloadSvg);
+$('downloadDxf').addEventListener('click', downloadDxf);
+
+// Load default font
+loadFont('https://fonts.gstatic.com/s/roboto/v30/KFOmCnqEu92Fr1Mu4mxK.woff');

@@ -8,65 +8,61 @@
   <link rel="stylesheet" href="./style.css">
 </head>
 <body>
-   <button class="theme-toggle" id="themeToggle">🌙</button>
-   <h1>Engrave Font → Vector <small>(mm)</small></h1>
-   <p>Convert text to precise SVG/DXF for CNC engraving with millimeter units and 0.001mm precision.</p>
-   <div class="grid">
-     <div>
-       <fieldset>
-         <legend>Text Input</legend>
-         <label>Text
-           <textarea id="text" rows="3" placeholder="Enter your text here">ŠeryWood</textarea>
-         </label>
-         <label>Font file (TTF/OTF)
-           <input id="font" type="file" accept=".ttf,.otf" />
-         </label>
-       </fieldset>
-
-       <fieldset>
-         <legend>Geometry Settings (mm)</legend>
-         <div class="row">
-           <label style="flex:1">Text Height
-             <input id="height" type="number" step="0.001" value="12.000" min="0.1" max="100"/>
-           </label>
-           <label style="flex:1">Curve Tolerance
-             <input id="tol" type="number" step="0.01" value="0.10" min="0.01" max="1"/>
-           </label>
-         </div>
-         <div class="row">
-           <label style="flex:1">Letter Spacing
-             <input id="ls" type="number" step="0.01" value="0.00" min="-5" max="10"/>
-           </label>
-           <label style="flex:1">Line Spacing
-             <input id="line" type="number" step="0.01" value="0.00" min="-10" max="20"/>
-           </label>
-         </div>
-         <div>
-           <label><input type="checkbox" id="kerning" checked/> Enable Kerning</label>
-           <label><input type="checkbox" id="separate"/> Separate Characters (DXF Layers)</label>
-         </div>
-       </fieldset>
-
-       <div class="actions">
-         <button id="render">🔄 Render Preview</button>
-         <div>
-           <button id="saveSvg">📥 Download SVG</button>
-           <button id="saveDxf">📥 Download DXF</button>
-         </div>
-       </div>
-       <div class="instructions">
-         <strong>Instructions:</strong> Upload a font file, adjust settings, click Render, then download SVG/DXF for CNC software like Fusion 360.
-       </div>
-     </div>
-     <div>
-       <div class="preview">
-         <svg id="svg" viewBox="0 0 200 100">
-           <text x="100" y="50" text-anchor="middle" font-size="12" fill="currentColor">Upload a font and enter text to preview</text>
-         </svg>
-       </div>
-       <p class="instructions">Preview shows text in mm coordinates (Y up). SVG/DXF exports match this scale.</p>
-     </div>
-   </div>
-   <script type="module" src="./main.js"></script>
- </body>
+  <div id="container">
+    <h1>Engrave Font → Vector</h1>
+    <div id="options">
+      <div class="option">
+        <label for="font">Font:</label>
+        <select id="font">
+          <option value="https://fonts.gstatic.com/s/roboto/v30/KFOmCnqEu92Fr1Mu4mxK.woff">Roboto</option>
+          <option value="https://fonts.gstatic.com/s/opensans/v34/memSYaGs126MiZpBA-UvWbX2vVnXBbObj2OVZyOOSr4dVJWUgsjZ0B4taVIGxA.woff">Open Sans</option>
+          <option value="https://fonts.gstatic.com/s/lato/v24/S6uyw4BMUTPHjx4wXg.woff">Lato</option>
+          <option value="https://fonts.gstatic.com/s/montserrat/v25/JTUHjIg1_i6t8kCHKm4532VJOt5-QNFgpCuM73w5aXp-pQ.woff">Montserrat</option>
+          <option value="https://fonts.gstatic.com/s/sourcesanspro/v21/6xK3dSBYKcSV-LCoeQqfX1RYOo3qOK7l.woff">Source Sans Pro</option>
+          <option value="https://fonts.gstatic.com/s/raleway/v28/1Ptug8zYS_SKggPNyC0IT4ttDfA.woff">Raleway</option>
+          <option value="https://fonts.gstatic.com/s/oswald/v49/TK3_WkUHHAIjg75cFRf3bXL8LICs1_FvsUZiZQ.woff">Oswald</option>
+          <option value="https://fonts.gstatic.com/s/merriweather/v30/u-440qyriQwlOrhSvowK_l5-fCZM.woff">Merriweather</option>
+          <option value="https://fonts.gstatic.com/s/playfairdisplay/v30/nuFvD-vYSZviVYUb_rj3ij__anPXJzDwcbmjW.woff">Playfair Display</option>
+          <option value="https://fonts.gstatic.com/s/dancingscript/v25/If2cXTr6YS-zF4S-kcSWSVi_sxjsohD9F50Ruu7BMSo3Rep8hNP.woff">Dancing Script</option>
+          <option value="https://fonts.gstatic.com/s/ubuntu/v20/4iCs6KVjbNBYlgoKfw72.woff">Ubuntu</option>
+          <option value="https://fonts.gstatic.com/s/nunito/v25/XRXV3I6Li01BKofINeaB.woff">Nunito</option>
+          <option value="https://fonts.gstatic.com/s/poppins/v20/pxiEyp8kv8JHgFVrFJA.woff">Poppins</option>
+          <option value="https://fonts.gstatic.com/s/inter/v12/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuLyfAZ9hiJ-Ek-_EeA.woff">Inter</option>
+          <option value="https://fonts.gstatic.com/s/robotoslab/v24/BngbUXZYTXPIvIBgJJSb.woff">Roboto Slab</option>
+        </select>
+      </div>
+      <div class="option">
+        <label for="text">Text:</label>
+        <input type="text" id="text" value="Hello World" />
+      </div>
+      <div class="option">
+        <label for="size">Size:</label>
+        <input type="range" id="size" min="10" max="200" value="100" />
+        <span id="sizeValue">100px</span>
+      </div>
+      <div class="option">
+        <label for="kerning">Kerning:</label>
+        <input type="checkbox" id="kerning" checked />
+      </div>
+      <div class="option">
+        <label for="separate">Separate Chars:</label>
+        <input type="checkbox" id="separate" />
+      </div>
+      <div class="option">
+        <button id="downloadSvg">Download SVG</button>
+        <button id="downloadDxf">Download DXF</button>
+      </div>
+    </div>
+    <div id="preview">
+      <svg id="svg" viewBox="0 0 800 200">
+        <text x="400" y="100" text-anchor="middle" font-size="50" fill="currentColor">Loading font...</text>
+      </svg>
+    </div>
+    <div id="path">
+      <h2>SVG Path</h2>
+      <textarea id="pathOutput" readonly></textarea>
+    </div>
+  </div>
+  <script type="module" src="./main.js"></script>
+</body>
 </html>

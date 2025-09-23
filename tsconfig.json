@@ -4,7 +4,7 @@
     "module": "esnext",
     "moduleResolution": "node",
     "outDir": "dist",
-    "rootDir": "web/src",
+    "rootDir": "src",
     "declaration": false,
     "strict": true,
     "esModuleInterop": true,
@@ -12,6 +12,6 @@
     "skipLibCheck": true
   },
   "include": [
-    "src"
+    "src/**/*"
   ]
 }
