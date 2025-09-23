@@ -66,7 +66,7 @@ function render() {
   const scale = fontSizePt / unitsPerEm;
 
   let x = 0;
-  let y = fontSizePt; // Baseline at font size for proper display
+  let y = 0; // Baseline at 0 for proper font metrics
   let paths = [];
 
   for (let i = 0; i < text.length; i++) {
@@ -89,14 +89,14 @@ function render() {
       svg.appendChild(path);
       paths.push(transformedPath); // Store original coordinates for export
 
-      // Use glyph width + fixed spacing for proper CNC visual separation
+      // Use glyph width + generous spacing for clear CNC visual separation
       let spacing;
       if (glyph.unicode === 32 || glyph.name === '.notdef') { // space or missing glyph
         spacing = glyph.advanceWidth * scale * (25.4/72);
       } else {
-        // Use glyph width + 1mm fixed spacing for consistent separation
+        // Use glyph width + 2mm fixed spacing for clear separation
         const glyphWidthMm = (glyph.width || glyph.advanceWidth) * scale * (25.4/72);
-        spacing = glyphWidthMm + 1.0; // 1mm additional spacing
+        spacing = glyphWidthMm + 2.0; // 2mm additional spacing
       }
 
       if (kerning && i < text.length - 1) {
@@ -146,8 +146,8 @@ function downloadSvg() {
   document.body.removeChild(tempSvg);
 
   const svgContent = `<?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="${bbox.x} ${bbox.y} ${bbox.width} ${bbox.height}">
-  <path d="${currentPath}" fill="black"/>
+<svg xmlns="http://www.w3.org/2000/svg" width="${bbox.width}mm" height="${bbox.height}mm" viewBox="${bbox.x} ${bbox.y} ${bbox.width} ${bbox.height}">
+  <path d="${currentPath}" fill="none" stroke="black" stroke-width="0.1"/>
 </svg>`;
 
   addDebug('SVG content generated, viewBox: ' + bbox.x + ',' + bbox.y + ' ' + bbox.width + 'x' + bbox.height);
