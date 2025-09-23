@@ -8,23 +8,52 @@ const $ = (id) => document.getElementById(id);
 
 let font = null;
 let currentPath = '';
+let debugLog = [];
+
+// Theme toggle
+const themeToggle = $('themeToggle');
+const currentTheme = localStorage.getItem('theme') || 'light';
+document.documentElement.setAttribute('data-theme', currentTheme);
+themeToggle.textContent = currentTheme === 'dark' ? '☀️' : '🌙';
+
+themeToggle.addEventListener('click', () => {
+  const newTheme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', newTheme);
+  localStorage.setItem('theme', newTheme);
+  themeToggle.textContent = newTheme === 'dark' ? '☀️' : '🌙';
+  addDebug('Theme changed to: ' + newTheme);
+});
+
+function addDebug(message) {
+  debugLog.push(new Date().toLocaleTimeString() + ': ' + message);
+  if (debugLog.length > 20) debugLog.shift();
+  $('debugOutput').innerHTML = debugLog.join('<br>');
+}
 
 async function loadFont(url) {
+  addDebug('Loading font from: ' + url);
   try {
     font = await opentype.load(url);
+    addDebug('Font loaded successfully: ' + font.familyName + ' ' + font.styleName);
     render();
   } catch (e) {
-    console.error('Failed to load font:', e);
-    $('svg').innerHTML = '<text x="400" y="100" text-anchor="middle" font-size="20" fill="red">Failed to load font</text>';
+    addDebug('Failed to load font: ' + e.message);
+    $('svg').innerHTML = `<text x="400" y="100" text-anchor="middle" font-size="16" fill="red">Failed to load font: ${e.message}</text>`;
   }
 }
 
 function render() {
-  if (!font) return;
+  addDebug('Render called, font loaded: ' + !!font);
+  if (!font) {
+    addDebug('No font loaded, skipping render');
+    return;
+  }
 
   const text = $('text').value;
   const size = parseInt($('size').value);
   const kerning = $('kerning').checked;
+
+  addDebug('Rendering text: "' + text + '" size: ' + size + ' kerning: ' + kerning);
 
   const svg = $('svg');
   svg.innerHTML = '';
@@ -39,9 +68,11 @@ function render() {
   for (let i = 0; i < text.length; i++) {
     const char = text[i];
     const glyph = font.charToGlyph(char);
+    addDebug('Char: ' + char + ' glyph: ' + (glyph ? 'found' : 'not found'));
 
     if (glyph) {
       const pathData = glyph.getPath(x, y, size).toPathData();
+      addDebug('Path data length: ' + pathData.length);
       const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
       path.setAttribute('d', pathData);
       path.setAttribute('fill', 'black');
@@ -64,22 +95,35 @@ function render() {
   }
 
   currentPath = paths.join(' ');
+  addDebug('Generated path length: ' + currentPath.length);
   $('pathOutput').value = currentPath;
 }
 
 function downloadSvg() {
-  if (!currentPath) return;
+  addDebug('Download SVG clicked, path length: ' + currentPath.length);
+  if (!currentPath) {
+    addDebug('No path to download');
+    alert('No path to download. Please render some text first.');
+    return;
+  }
 
   const svgContent = `<?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 200">
   <path d="${currentPath}" fill="black"/>
 </svg>`;
 
+  addDebug('SVG content generated, length: ' + svgContent.length);
   download('font-path.svg', svgContent, 'image/svg+xml');
+  addDebug('SVG download initiated');
 }
 
 function downloadDxf() {
-  if (!currentPath) return;
+  addDebug('Download DXF clicked, path length: ' + currentPath.length);
+  if (!currentPath) {
+    addDebug('No path to download');
+    alert('No path to download. Please render some text first.');
+    return;
+  }
 
   const dxf = new DxfWriter();
   dxf.setUnits(Units.Millimeters);
@@ -98,7 +142,10 @@ function downloadDxf() {
     dxf.addPolyline(points, false, 'FONT_PATH');
   }
 
-  download('font-path.dxf', dxf.stringify(), 'application/dxf');
+  const dxfContent = dxf.stringify();
+  addDebug('DXF content generated, length: ' + dxfContent.length + ', points: ' + points.length);
+  download('font-path.dxf', dxfContent, 'application/dxf');
+  addDebug('DXF download initiated');
 }
 
 function download(filename, content, mimeType) {
@@ -131,4 +178,4 @@ $('downloadSvg').addEventListener('click', downloadSvg);
 $('downloadDxf').addEventListener('click', downloadDxf);
 
 // Load default font
-loadFont('https://fonts.gstatic.com/s/roboto/v30/KFOmCnqEu92Fr1Mu4mxK.woff');
+loadFont('https://cdn.jsdelivr.net/npm/@fontsource/roboto@5.0.8/files/roboto-latin-400-normal.woff');
