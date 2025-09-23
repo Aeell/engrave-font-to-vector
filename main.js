@@ -89,12 +89,13 @@ function render() {
       svg.appendChild(path);
       paths.push(transformedPath); // Store original coordinates for export
 
-      // Use glyph width for spacing to prevent overlap, advanceWidth for spaces
+      // Use advanceWidth with padding for proper CNC spacing
       let spacing;
       if (glyph.unicode === 32 || glyph.name === '.notdef') { // space or missing glyph
         spacing = glyph.advanceWidth * scale * (25.4/72);
       } else {
-        spacing = (glyph.width || glyph.advanceWidth) * scale * (25.4/72);
+        // Add 10% padding to advanceWidth for visual separation
+        spacing = glyph.advanceWidth * scale * (25.4/72) * 1.1;
       }
 
       if (kerning && i < text.length - 1) {
@@ -131,6 +132,9 @@ function downloadSvg() {
     return;
   }
 
+  const text = $('text').value.trim();
+  const filename = text ? text.replace(/[^a-zA-Z0-9]/g, '_') + '.svg' : 'text.svg';
+
   // Calculate bounding box for proper viewBox
   const tempSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
   const tempPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
@@ -146,8 +150,8 @@ function downloadSvg() {
 </svg>`;
 
   addDebug('SVG content generated, viewBox: ' + bbox.x + ',' + bbox.y + ' ' + bbox.width + 'x' + bbox.height);
-  download('font-path.svg', svgContent, 'image/svg+xml');
-  addDebug('SVG download initiated');
+  download(filename, svgContent, 'image/svg+xml');
+  addDebug('SVG download initiated: ' + filename);
 }
 
 function downloadDxf() {
@@ -175,10 +179,13 @@ function downloadDxf() {
     dxf.addPolyline(points, false, 'FONT_PATH');
   }
 
+  const text = $('text').value.trim();
+  const filename = text ? text.replace(/[^a-zA-Z0-9]/g, '_') + '.dxf' : 'text.dxf';
+
   const dxfContent = dxf.stringify();
   addDebug('DXF content generated, length: ' + dxfContent.length + ', points: ' + points.length);
-  download('font-path.dxf', dxfContent, 'application/dxf');
-  addDebug('DXF download initiated');
+  download(filename, dxfContent, 'application/dxf');
+  addDebug('DXF download initiated: ' + filename);
 }
 
 function download(filename, content, mimeType) {

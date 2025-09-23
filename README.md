@@ -3,7 +3,7 @@
 
 **Proprietary CNC Text Engraving Software for Aluminum Labels**
 
-Developed exclusively for JKT Group s.r.o. CNC machining operations in Prague, Czech Republic.
+Developed exclusively for JKT Group s.r.o. CNC machining operations in Liberec, Czech Republic.
 
 > **Proprietary Software** - JKT Group s.r.o. Internal Use Only
 
@@ -91,7 +91,7 @@ Developed exclusively for JKT Group s.r.o. CNC machining operations in Prague, C
 
 For technical support or questions about the JKT Font Engraver:
 
-**Contact**: JKT Group s.r.o., Prague, Czech Republic
+**Contact**: JKT Group s.r.o., Liberec, Czech Republic
 **Purpose**: Internal CNC engraving operations for aluminum label manufacturing
 
 This tool is proprietary to JKT Group s.r.o. and not available for external use.
