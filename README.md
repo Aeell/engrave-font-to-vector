@@ -17,7 +17,10 @@ Outputs **true millimeter** geometry with **0.001 mm** precision for easy import
 - ✅ Union filled contours (approximate; uses Clipper after adaptive flattening).
 - ✅ SVG and DXF exports.
 - ✅ Non-scaling stroke output (for preview only).
-- ✅ CLI **and** Web UI.
+- ✅ CLI **and** Web UI with dark mode support.
+- ✅ Improved UI with better styling and user experience.
+- ✅ Font caching for faster re-rendering.
+- ✅ Input validation and helpful instructions.
 
 ## Install (CLI + Web UI)
 ```bash
