@@ -33,5 +33,5 @@ export function flattenSvgPath(d, toleranceMm) {
 }
 /** Apply transform to path string (translate + scale) */
 export function transformPath(d, scale, tx, ty) {
-    return svgpath(d).scale(scale, -scale).translate(tx, -ty).toString(); // flip Y to CAD (Y up)
+    return svgpath(d).scale(scale, scale).translate(tx, ty).toString(); // normal orientation
 }

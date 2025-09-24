@@ -91,23 +91,28 @@ function render() {
       svg.appendChild(path);
       paths.push(transformedPath); // Store original coordinates for export
 
-      // Proportional spacing: 20% of height in mm for consistent separation
-      const spacingMm = heightMm * 0.2;
+      // Proportional spacing: 40% of height in mm for consistent separation
+      const spacingMm = heightMm * 0.4;
       let spacingPt = spacingMm * (72 / 25.4);
-      if (glyph.unicode === 32 || glyph.name === '.notdef') { // space or missing glyph
+      if (glyph.unicode === 32) { // space
+        spacingPt = Math.max(glyph.advanceWidth, spacingPt * 0.5); // use glyph advance or half spacing
+      } else if (glyph.name === '.notdef') { // missing glyph
         spacingPt = glyph.advanceWidth;
       }
 
       let advance = spacingPt;
+      addDebug('Char: ' + char + ', spacingPt: ' + spacingPt.toFixed(2) + ', advanceWidth: ' + glyph.advanceWidth);
       if (kerning && i < text.length - 1) {
         const nextGlyph = font.charToGlyph(text[i + 1]);
         if (nextGlyph) {
           const kern = font.getKerningValue(glyph, nextGlyph);
           const kernPt = kern * (fontSizePt / unitsPerEm);
           advance += kernPt;
+          addDebug('Kerning with next ' + text[i + 1] + ': ' + kernPt.toFixed(2));
         }
       }
       x += advance;
+      addDebug('Total advance: ' + advance.toFixed(2) + ', new x: ' + x.toFixed(2));
     }
   }
 
