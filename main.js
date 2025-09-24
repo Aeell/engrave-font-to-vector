@@ -62,9 +62,10 @@ function render() {
   const svg = $('svg');
   svg.innerHTML = '';
 
-  // Convert mm to font size (points)
-  const fontSizePt = mmToFontSize(heightMm);
+  // Convert mm to font size (points), scaled to match actual glyph height
   const unitsPerEm = font.unitsPerEm || 1000;
+  const glyphHeightUnits = (font.ascender - font.descender) || unitsPerEm;
+  const fontSizePt = heightMm * unitsPerEm / (glyphHeightUnits * 25.4 / 72);
   const scale = fontSizePt / unitsPerEm;
 
   let x = 0;
