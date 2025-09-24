@@ -98,25 +98,39 @@ function render() {
         spacingPt = 4.0 * (72 / 25.4); // 4mm in pt ≈ 11.34pt
       }
 
+      let advance = spacingPt;
       if (kerning && i < text.length - 1) {
         const nextGlyph = font.charToGlyph(text[i + 1]);
         if (nextGlyph) {
           const kern = font.getKerningValue(glyph, nextGlyph);
-          x += spacingPt + kern;
-        } else {
-          x += spacingPt;
+          const kernPt = kern * (fontSizePt / unitsPerEm);
+          advance += kernPt;
         }
-      } else {
-        x += spacingPt;
       }
+      x += advance;
     }
   }
 
-  // Set SVG viewBox to fit content with stroke
+  // Scale and center the preview for consistent visual size
   const bbox = svg.getBBox();
-  const padding = Math.max(strokeMm * 2, 10);
-  const viewBox = `${bbox.x - padding} ${bbox.y - padding} ${bbox.width + 2*padding} ${bbox.height + 2*padding}`;
-  svg.setAttribute('viewBox', viewBox);
+  const targetHeight = 40; // mm in viewBox
+  const previewScale = targetHeight / bbox.height;
+  const targetWidth = 200;
+  const targetViewHeight = 50;
+  const tx = (targetWidth - previewScale * bbox.width) / 2;
+  const ty = (targetViewHeight - previewScale * bbox.height) / 2;
+
+  // Scale and translate each path
+  const previewPaths = svg.querySelectorAll('path');
+  previewPaths.forEach(path => {
+    const d = path.getAttribute('d');
+    const newD = svgpath(d).scale(previewScale, previewScale).translate(tx, ty).toString();
+    path.setAttribute('d', newD);
+    const currentStroke = parseFloat(path.getAttribute('stroke-width'));
+    path.setAttribute('stroke-width', (currentStroke * previewScale).toString());
+  });
+
+  svg.setAttribute('viewBox', `0 0 ${targetWidth} ${targetViewHeight}`);
   addDebug('ViewBox set to: ' + viewBox + ' (bbox: ' + bbox.x + ',' + bbox.y + ' ' + bbox.width + 'x' + bbox.height + ')');
 
   currentPath = paths.join(' ');
