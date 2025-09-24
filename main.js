@@ -89,13 +89,11 @@ function render() {
       svg.appendChild(path);
       paths.push(transformedPath); // Store original coordinates for export
 
-      // Use fixed spacing in pt units for consistent CNC engraving separation
-      let spacingPt;
+      // Proportional spacing: 20% of height in mm for consistent separation
+      const spacingMm = heightMm * 0.2;
+      let spacingPt = spacingMm * (72 / 25.4);
       if (glyph.unicode === 32 || glyph.name === '.notdef') { // space or missing glyph
         spacingPt = glyph.advanceWidth;
-      } else {
-        // Fixed spacing: convert 4mm to pt units
-        spacingPt = 4.0 * (72 / 25.4); // 4mm in pt ≈ 11.34pt
       }
 
       let advance = spacingPt;
