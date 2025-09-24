@@ -9,6 +9,7 @@ const $ = (id) => document.getElementById(id);
 
 let font = null;
 let currentPath = '';
+let currentStrokeMm = 0.5;
 let debugLog = [];
 
 // Theme toggle
@@ -53,6 +54,7 @@ function render() {
   const text = $('text').value;
   const heightMm = parseFloat($('size').value);
   const strokeMm = parseFloat($('stroke').value);
+  currentStrokeMm = strokeMm;
   const kerning = $('kerning').checked;
 
   addDebug('Rendering text: "' + text + '" height: ' + heightMm + 'mm stroke: ' + strokeMm + 'mm kerning: ' + kerning);
@@ -157,8 +159,8 @@ function downloadSvg() {
   document.body.removeChild(tempSvg);
 
   const svgContent = `<?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" width="${bbox.width}mm" height="${bbox.height}mm" viewBox="${bbox.x} ${bbox.y} ${bbox.width} ${bbox.height}">
-  <path d="${currentPath}" fill="none" stroke="black" stroke-width="0.1"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="${bbox.x} ${bbox.y} ${bbox.width} ${bbox.height}">
+ <path d="${currentPath}" fill="none" stroke="black" stroke-width="${currentStrokeMm}"/>
 </svg>`;
 
   addDebug('SVG content generated, viewBox: ' + bbox.x + ',' + bbox.y + ' ' + bbox.width + 'x' + bbox.height);
