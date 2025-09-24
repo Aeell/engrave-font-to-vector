@@ -91,17 +91,17 @@ function render() {
       svg.appendChild(path);
       paths.push(transformedPath); // Store original coordinates for export
 
-      // Proportional spacing: 40% of height in mm for consistent separation
-      const spacingMm = heightMm * 0.4;
+      // Proportional spacing: 50% of height in mm for consistent separation
+      const spacingMm = heightMm * 0.5;
       let spacingPt = spacingMm * (72 / 25.4);
       if (glyph.unicode === 32) { // space
-        spacingPt = Math.max(glyph.advanceWidth, spacingPt * 0.5); // use glyph advance or half spacing
+        spacingPt = 2 * (72 / 25.4); // fixed 2mm for space
       } else if (glyph.name === '.notdef') { // missing glyph
         spacingPt = glyph.advanceWidth;
       }
 
       let advance = spacingPt;
-      addDebug('Char: ' + char + ', spacingPt: ' + spacingPt.toFixed(2) + ', advanceWidth: ' + glyph.advanceWidth);
+      addDebug('Char: ' + char + ', spacingPt: ' + spacingPt.toFixed(2) + ', advanceWidth: ' + glyph.advanceWidth.toFixed(2));
       if (kerning && i < text.length - 1) {
         const nextGlyph = font.charToGlyph(text[i + 1]);
         if (nextGlyph) {
